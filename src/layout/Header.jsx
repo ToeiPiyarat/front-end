@@ -18,7 +18,8 @@ const userNav = [
 
 const adminNav = [
   { to : '/admin', text: 'หน้าหลัก' },
-  { to : '/reserved/edit', text: 'เช็คสถานะผู้ใช้งาน' },
+  { to : '/History', text: 'เช็คสถานะผู้ใช้งาน' },
+  { to : '/addcar', text: 'เพิ่มข้อมูล'}
 ]
 
 export default function Header() {

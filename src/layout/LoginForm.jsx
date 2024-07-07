@@ -25,6 +25,7 @@ export default function LoginForm() {
         headers: { Authorization: `Bearer ${rs.data.token}` }
       });
       setUser(rs1.data);
+      console.log(rs.data)
       window.location.reload();
     } catch (err) {
       setErrorMessage('ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง');

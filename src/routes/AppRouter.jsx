@@ -4,8 +4,8 @@ import RegisterForm from '../layout/RegisterForm'
 import useAuth from '../hooks/useAuth'
 import Header from '../layout/Header'
 import HOME from '../layout/HOME'
-import ReservedDashboard from '../components/Reseverd'
-import ReseverdForm from '../components/ReservedForm'
+// import ReservedDashboard from '../components/Reseverd'
+// import AdminReseverd  from '../components/AdminReseverd'
 import Admin from '../layout/Admin'
 import AdminReseverd from'../components/AdminReseverd'
 import UserProfire from '../components/UserProfire'
@@ -18,6 +18,8 @@ import Userzone from '../components/Userzone'
 import Userpay from '../components/Userpay'
 import Reseverd from '../components/Reseverd'
 import PaymentUserId from '../components/paymentuserid'
+import AdminInputData  from '../components/AdminInputData'
+import AdminAbbLock from '../components/AdminAbbLock'
 
 
 const guestRouter = createBrowserRouter([
@@ -84,13 +86,15 @@ const adminRouter = createBrowserRouter([
       { index: true, element: <Admin /> },
       { path: '/login', element: <LoginForm /> },
       { path: '/home', element:<HOME/> },
-      { path: '/reserved', element:<ReseverdForm/> },
+      // { path: '/reserved', element:<ReseverdForm/> },
       // { path: '/reserved/show', element:<ReservedDashboard/> },
       // { path: '/reserved/delete/:reservedId', element:<ReservedDashboard/> },
       { path: '/admin', element:<Admin/> },
       { path: '*', element: <p> PAGE NOT FOUND</p>},
-      { path: '/reserved/edit', element: <AdminReseverd/> },
+      { path: '/History', element: <AdminReseverd/> },
       { path: '/add', element: <USerAddCar/> },
+      { path: '/addcar', element: <AdminInputData/>},
+      { path: '/addlock/:id', element: <AdminAbbLock/>}
       
       
     ]
