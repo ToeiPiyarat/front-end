@@ -1,9 +1,10 @@
 import axios from 'axios';
 import { useState } from "react";
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import './RegisterForm.css'; // Import the CSS file
 
 export default function RegisterForm() {
-
   const navigate = useNavigate();
   const [input, setInput] = useState({
     username: '', 
@@ -11,127 +12,156 @@ export default function RegisterForm() {
     confirmPassword: '',
     email: '',
     phone: '',
-    vehicleNumber: '',
     firstname: '',
     lastname: ''
   });
 
   const hdlChange = e => {
-    setInput(prv => ({ ...prv, [e.target.name]: e.target.value }));
-  }
+    setInput(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
 
-  const hdlSubmit = async e => {
+  const hdlSubmit = async (e) => {
+    e.preventDefault();
+
+    // Validate password confirmation
+    if (input.password !== input.confirmPassword) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Please check confirm password!',
+      });
+      return;
+    }
+
+    // Ask for confirmation before registration
+    const confirmRegister = await Swal.fire({
+      icon: 'question',
+      title: 'ยืนยันการสมัคร',
+      text: 'คุณต้องการที่จะสมัครด้วยบัญชีนี้จริงหรือไม่?',
+      showCancelButton: true,
+      confirmButtonText: 'ใช่, สมัคร',
+      cancelButtonText: 'ยกเลิก'
+    });
+
+    if (!confirmRegister.isConfirmed) {
+      return; // Cancel registration if not confirmed
+    }
+
     try {
-      e.preventDefault();
-      // validation
-      if (input.password !== input.confirmPassword) {
-        return alert('Please check confirm password');
-      }
       const rs = await axios.post('http://localhost:8889/auth/register', input);
-      console.log(rs);
       if (rs.status === 200) {
-        alert('Register Successful');
-        navigate('/login');
+        Swal.fire({
+          icon: 'success',
+          title: 'สมัครสมาชิกสำเร็จ!',
+          text: 'คุณได้ทำการสมัครสมาชิกเรียบร้อยแล้ว',
+        }).then(() => {
+          navigate('/login'); // Redirect to login page after successful registration
+        });
       }
     } catch (err) {
-      console.log(err.message);
+      if (err.response && err.response.status === 409) {
+        Swal.fire({
+          icon: 'error',
+          title: 'สมัครสมาชิกไม่สำเร็จ',
+          text: 'มีบัญชีผู้ใช้นี้อยู่ในระบบแล้ว กรุณาเลือกชื่อผู้ใช้งานอื่น',
+        });
+      } else {
+        console.error(err);
+        Swal.fire({
+          icon: 'error',
+          title: 'สมัครสมาชิกไม่สำเร็จ',
+          text: 'เกิดข้อผิดพลาดในการสมัครสมาชิก กรุณาลองอีกครั้งภายหลัง',
+        });
+      }
     }
-  }
+  };
 
   return (
-    <div className="p-5 border w-4/6 min-w-[100px] mx-auto rounded mt-5 bg-red-100 max-w-[30vw]">
-      <div className="text-3xl mb-5">กรอกข้อมูลเพื่อสมัครใช้งาน</div>
-      <form className="flex flex-col gap-2" onSubmit={hdlSubmit}>
-        <label className="form-control w-full max-w-xs">
-          <div className="label">
-            <span className="label-text">ชื่อผู้ใช้งาน</span>
+    <div className="register-container">
+      <div className="register-form">
+        <h2 className="form-title">กรอกข้อมูล เพื่อสมัครใช้งาน</h2>
+        <form onSubmit={hdlSubmit}>
+          <div className="form-row">
+            <div className="form-group">
+              <label className="form-label">ชื่อ</label>
+              <input
+                type="text"
+                className="form-input"
+                name="firstname"
+                value={input.firstname}
+                onChange={hdlChange}
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">นามสกุล</label>
+              <input
+                type="text"
+                className="form-input"
+                name="lastname"
+                value={input.lastname}
+                onChange={hdlChange}
+              />
+            </div>
           </div>
-          <input
-            type="text"
-            className="input input-bordered w-full max-w-xs"
-            name="username"
-            value={input.username}
-            onChange={hdlChange}
-          />
-        </label>
-        
-        <label className="form-control w-full max-w-xs">
-          <div className="label">
-            <span className="label-text">รหัสผ่าน</span>
+          <div className="form-group">
+            <label className="form-label">ชื่อผู้ใช้งาน</label>
+            <input
+              type="text"
+              className="form-input"
+              name="username"
+              value={input.username}
+              onChange={hdlChange}
+            />
           </div>
-          <input
-            type="password"
-            className="input input-bordered w-full max-w-xs"
-            name="password"
-            value={input.password}
-            onChange={hdlChange}
-          />
-        </label>
-        <label className="form-control w-full max-w-xs">
-          <div className="label">
-            <span className="label-text">ยื่นยันรหัสผ่าน</span>
+          <div className="form-row">
+            <div className="form-group">
+              <label className="form-label">รหัสผ่าน</label>
+              <input
+                type="password"
+                className="form-input"
+                name="password"
+                value={input.password}
+                onChange={hdlChange}
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">ยืนยันรหัสผ่าน</label>
+              <input
+                type="password"
+                className="form-input"
+                name="confirmPassword"
+                value={input.confirmPassword}
+                onChange={hdlChange}
+              />
+            </div>
           </div>
-          <input
-            type="password"
-            className="input input-bordered w-full max-w-xs"
-            name="confirmPassword"
-            value={input.confirmPassword}
-            onChange={hdlChange}
-          />
-        </label>
-        <label className="form-control w-full max-w-xs">
-          <div className="label">
-            <span className="label-text">อีเมล์</span>
+          <div className="form-group">
+            <label className="form-label">อีเมล์</label>
+            <input
+              type="email"
+              className="form-input"
+              name="email"
+              value={input.email}
+              onChange={hdlChange}
+            />
           </div>
-          <input
-            type="email"
-            className="input input-bordered w-full max-w-xs"
-            name="email"
-            value={input.email}
-            onChange={hdlChange}
-          />
-        </label>
-        <label className="form-control w-full max-w-xs">
-          <div className="label">
-            <span className="label-text">เบอร์โทร</span>
+          <div className="form-group">
+            <label className="form-label">เบอร์โทร</label>
+            <input
+              type="text"
+              className="form-input"
+              name="phone"
+              value={input.phone}
+              onChange={hdlChange}
+            />
           </div>
-          <input
-            type="text"
-            className="input input-bordered w-full max-w-xs"
-            name="phone"
-            value={input.phone}
-            onChange={hdlChange}
-          />
-        </label>
-        <label className="form-control w-full max-w-xs">
-          <div className="label">
-            <span className="label-text">ชื่อ</span>
+          <div className="form-button">
+            <button type="submit" className="submit-button">
+              สมัครสมาชิก
+            </button>
           </div>
-          <input
-            type="text"
-            className="input input-bordered w-full max-w-xs"
-            name="firstname"
-            value={input.firstname}
-            onChange={hdlChange}
-          />
-        </label>
-        <label className="form-control w-full max-w-xs">
-          <div className="label">
-            <span className="label-text">นามสกุล</span>
-          </div>
-          <input
-            type="text"
-            className="input input-bordered w-full max-w-xs"
-            name="lastname"
-            value={input.lastname}
-            onChange={hdlChange}
-          />
-        </label>
-        <div className="flex gap-5 ">
-          <button type="submit" className="btn btn-outline bg-green-500 hover:bg-green-600 focus:bg-green-600 hover:text-white focus:text-white">สมัคร</button>
-          {/* <button type="reset" className="btn btn-outline bg-green-500 hover:bg-green-600 focus:bg-green-600 hover:text-white focus:text-white">รีเซ็ด</button> */}
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 }

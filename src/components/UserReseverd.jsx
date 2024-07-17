@@ -1,22 +1,34 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import loginImage from '../assets/bg.png';
 
 export default function UserReserved() {
   const navigate = useNavigate();
   const linkToReserved = () => {
     navigate("/reservation");
   };
+
   return (
-    <div className="card w-96 bg-gradient-to-br from-pink-200 to-purple-200 shadow-xl mx-auto rounded-lg p-8">
-      <h2 className="card-title text-3xl text-center font-semibold mb-4 text-gray-800">ยินดีต้อนรับ</h2>
-      <div className="card-body text-center">
-        <h2 className="card-title text-2xl font-semibold mb-4 text-gray-800">ทำการจอง</h2>
-        <p className="text-lg mb-2 text-gray-700">ตอนนี้ท่านเข้าสู่ระบบแล้ว</p>
-        <p className="text-lg mb-4 text-gray-700">สามารถทำการจองรถได้แล้ว</p>
-        <div className="card-actions flex justify-center">
-          <button onClick={linkToReserved} className="btn btn-primary bg-gradient-to-r from-green-300 to-green-400 hover:from-green-400 hover:to-green-500 text-white 
-            px-4 py-2 rounded-md shadow-md transition-colors duration-300">จองตรงนี้</button>
+    <div className="flex">
+      <div className="flex-1 p-4 text-center">
+        <h2 className="text-3xl font-bold text-gray-800 mb-4">ยินดีต้อนรับ</h2>
+        <h3 className="text-6xl text-gray-600 mb-4">SopaEnjoyPark</h3>
+        <div className="flex justify-center items-center flex-col h-full">
+          <p className="text-lg text-gray-700 mb-8">สามารถเลือกที่จอดได้เลย</p>
+          <button
+            onClick={linkToReserved}
+            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+          >
+            เลือกที่จอง
+          </button>
         </div>
+      </div>
+      <div className="flex-1 flex justify-center items-center">
+        <img
+          src={loginImage}
+          style={{ maxWidth: "100%", height: "auto", maxHeight: "550px" }}
+          alt="Login"
+        />
       </div>
     </div>
   );

@@ -10,7 +10,7 @@ import Admin from '../layout/Admin'
 import AdminReseverd from'../components/AdminReseverd'
 import UserProfire from '../components/UserProfire'
 // import UserVechinumber from '../components/UserVechinumber'
-import USerAddCar from '../components/USerAddCar'
+// import USerAddCar from '../components/USerAddCar'
 // import EditReseved from '../components/EditReseved'
 import Homepage from '../layout/Homepage'
 import UserReservation from '../components/UserReservation'
@@ -66,7 +66,7 @@ const userRouter = createBrowserRouter([
       // { path: '/add', element: <USerAddCar/> },
       // { path: '/edit/*', element: <EditReseved/> },
       { path: '/reservation', element: <UserReservation/>},
-      { path: '/zone/:id', element: <Userzone/>},
+      { path: '/addlock/:id', element: <Userzone/>},
       { path: '/booking/:id', element: <Reseverd/> },
       { path: '/userpay/:id', element: <Userpay/>},
       { path: '/payuser', element: <PaymentUserId/>}
@@ -92,7 +92,7 @@ const adminRouter = createBrowserRouter([
       { path: '/admin', element:<Admin/> },
       { path: '*', element: <p> PAGE NOT FOUND</p>},
       { path: '/History', element: <AdminReseverd/> },
-      { path: '/add', element: <USerAddCar/> },
+      // { path: '/add', element: <USerAddCar/> },
       { path: '/addcar', element: <AdminInputData/>},
       { path: '/addlock/:id', element: <AdminAbbLock/>}
       

@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from "react-router-dom";
-import { getMarket, postparking } from '../API/api';
+import { getMarket, postparking, deleteParking } from '../API/api';
+import Swal from 'sweetalert2';
 
 export const AdminHistory = () => {
   const navigate = useNavigate();
   const [market, setMarket] = useState([]);
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedImages, setSelectedImages] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [parking, setparking] = useState({
+  const [parking, setParking] = useState({
     parking_name: '',
     parking_location: '',
     city: '',
@@ -17,41 +18,84 @@ export const AdminHistory = () => {
 
   const hdlChange = (e) => {
     const { name, value } = e.target;
-    setparking((prevParking) => ({
+    setParking((prevParking) => ({
       ...prevParking,
       [name]: value
     }));
   };
 
-  const submitparking = async (e) => {
+  const submitParking = async (e) => {
     e.preventDefault();
+    const swalConfirm = await Swal.fire({
+      title: 'ยืนยันการเพิ่มข้อมูล',
+      text: 'คุณต้องการที่จะเพิ่มข้อมูลที่จอดรถนี้ใช่หรือไม่?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'ใช่, ฉันต้องการเพิ่ม!',
+      cancelButtonText: 'ยกเลิก'
+    });
+
+    if (swalConfirm.isConfirmed) {
+      try {
+        const rs = await postparking(parking);
+        setParking(rs.data);
+        console.log(rs.data);
+        Swal.fire('สำเร็จ!', 'ข้อมูลที่จอดรถถูกเพิ่มเรียบร้อยแล้ว', 'success');
+        setShowForm(false); 
+        fetchMarket(); // Refresh market data
+      } catch (err) {
+        console.error(err);
+        Swal.fire('ผิดพลาด!', 'มีปัญหาในการเพิ่มข้อมูลที่จอดรถ', 'error');
+      }
+    }
+  };
+
+  const fetchMarket = async () => {
     try {
-      const rs = await postparking(parking);
-      setparking(rs.data);
+      const rs = await getMarket();
+      setMarket(rs.data);
       console.log(rs.data);
-      alert("Parking information submitted successfully!");
-      setShowForm(false); 
     } catch (err) {
       console.error(err);
-      alert("Failed to submit parking information.");
     }
   };
 
   useEffect(() => {
-    const fetchMarket = async () => {
-      try {
-        const rs = await getMarket();
-        setMarket(rs.data);
-        console.log(rs.data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
     fetchMarket();
   }, []);
 
-  const handleSelection = (image) => {
-    setSelectedImage(image);
+  const handleSelection = (id) => {
+    if (selectedImages.includes(id)) {
+      setSelectedImages(selectedImages.filter(imageId => imageId !== id));
+    } else {
+      setSelectedImages([...selectedImages, id]);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    const swalConfirm = await Swal.fire({
+      title: 'ยืนยันการลบข้อมูล',
+      text: 'คุณต้องการที่จะลบข้อมูลที่จอดรถนี้ใช่หรือไม่?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'ใช่, ฉันต้องการลบ!',
+      cancelButtonText: 'ยกเลิก'
+    });
+
+    if (swalConfirm.isConfirmed) {
+      try {
+        await deleteParking(id);
+        Swal.fire('สำเร็จ!', 'ข้อมูลที่จอดรถถูกลบเรียบร้อยแล้ว', 'success');
+        fetchMarket(); // Refresh market data
+      } catch (err) {
+        console.error(err);
+        Swal.fire('ผิดพลาด!', 'มีปัญหาในการลบข้อมูลที่จอดรถ', 'error');
+      }
+    }
   };
 
   return (
@@ -63,9 +107,9 @@ export const AdminHistory = () => {
         เพิ่มข้อมูล
       </button>
       {showForm && (
-        <form onSubmit={submitparking} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+        <form onSubmit={submitParking} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">Parking Name:</label>
+            <label className="block text-gray-700 text-sm font-bold mb-2">ชื่อที่จอดรถ:</label>
             <input
               type="text"
               name="parking_name"
@@ -76,7 +120,7 @@ export const AdminHistory = () => {
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">Parking Location:</label>
+            <label className="block text-gray-700 text-sm font-bold mb-2">ที่ตั้งที่จอดรถ:</label>
             <input
               type="text"
               name="parking_location"
@@ -87,7 +131,7 @@ export const AdminHistory = () => {
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">City:</label>
+            <label className="block text-gray-700 text-sm font-bold mb-2">เมือง:</label>
             <input
               type="text"
               name="city"
@@ -98,7 +142,7 @@ export const AdminHistory = () => {
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">Province:</label>
+            <label className="block text-gray-700 text-sm font-bold mb-2">จังหวัด:</label>
             <input
               type="text"
               name="province"
@@ -109,7 +153,7 @@ export const AdminHistory = () => {
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">Photo URL:</label>
+            <label className="block text-gray-700 text-sm font-bold mb-2">URL รูปภาพ:</label>
             <input
               type="text"
               name="photo"
@@ -122,37 +166,45 @@ export const AdminHistory = () => {
             type="submit"
             className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
           >
-            Submit Parking
+            เพิ่มที่จอดรถ
           </button>
         </form>
       )}
 
-      <div>
-        {market.map((markets) => (
-          <div key={markets.id} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-            <Link to={`/addlock/${markets.id}`} className="text-blue-500 hover:underline">
-              <p className="text-lg font-bold">{markets.parking_name}</p>
-              <p>{markets.parking_location}</p>
-              <p>{markets.city}</p>
-              <p>{markets.province}</p>
-            </Link>
-            <button
-              onClick={() => handleSelection(markets.photo)}
-              className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mt-2"
-            >
-              Show Image
-            </button>
-          </div>
-        ))}
-      </div>
-      {selectedImage && (
-        <div className="mt-4">
-          <img src={selectedImage} alt="Market" className="w-full h-auto" />
+      {market.map((markets) => (
+        <div key={markets.id} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+          <Link to={`/addlock/${markets.id}`} className="text-blue-500 hover:underline">
+            <p className="text-lg font-bold">{markets.parking_name}</p>
+            <p>{markets.parking_location}</p>
+            <p>{markets.city}</p>
+            <p>{markets.province}</p>
+          </Link>
+          <button
+            onClick={() => handleSelection(markets.id)}
+            className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mt-2"
+          >
+            {selectedImages.includes(markets.id) ? 'ซ่อนรูปภาพ' : 'แสดงรูปภาพ'}
+          </button>
+          <button
+            onClick={() => handleDelete(markets.id)}
+            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-2 ml-2"
+          >
+            ลบ
+          </button>
+          {selectedImages.includes(markets.id) && (
+            <div className="mt-2">
+              <img
+                src={markets.photo}
+                alt="Market"
+                className="w-60 h-60 object-cover rounded-lg"
+                style={{ maxWidth: '300px', maxHeight: '300px' }}
+              />
+            </div>
+          )}
         </div>
-      )}
+      ))}
     </div>
-  )
+  );
 }
 
 export default AdminHistory;
-

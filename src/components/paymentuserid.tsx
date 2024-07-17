@@ -42,6 +42,9 @@ function PaymentUserId() {
                   Payment Method
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Payment Method
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
               </tr>
@@ -49,10 +52,11 @@ function PaymentUserId() {
             <tbody className="bg-white divide-y divide-gray-200">
               {payments.map((payment) => (
                 <tr key={payment.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">{payment.booking_id}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{payment.amount}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{payment.booking.locks.parking.parking_name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{payment.booking.locks.lock_name}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{new Date(payment.date).toLocaleDateString()}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{payment.payment_method}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{payment.booking.brand}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{payment.booking.Vehiclenumber}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{payment.status}</td>
                 </tr>
               ))}

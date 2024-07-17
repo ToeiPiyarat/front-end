@@ -39,6 +39,8 @@ export const getpayment = () => apipay.get('/payments')
 export const postparking = (parking) => api.post('/parking', parking)
 export const postlock = (lock) => api.post('/lockpost', lock)
 export const deletelock = (id) => api.delete(`/lockdelete/${id}`)
-
+export const deleteParking = (id) => api.delete(`/parking/${id}`);
+export const patchupdate = (id, updateData) => api.patch(`/update/${id}`, updateData);
+export const shbookingall = () => apibooking.get('/shbookin')
 
 export default api;

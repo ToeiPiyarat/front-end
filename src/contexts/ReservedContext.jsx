@@ -7,45 +7,45 @@ function ReservedContextProvider(props) {
   const [adminData, setAdminData] = useState(null)
   const [trigger, setTrigger] = useState(false)
 
-  useEffect(() => {
-    const showReserved = async () => {
-      try {
-        const token = localStorage.getItem('token')
-        if (!token) {return}
-        const rs = await axios.get("http://localhost:8889/reserved/show", {
-          headers: {Authorization: `Bearer ${token}`}
-        });
-        // console.log(rs.data)
-        setData(rs.data)
+  // useEffect(() => {
+  //   const showReserved = async () => {
+  //     try {
+  //       const token = localStorage.getItem('token')
+  //       if (!token) {return}
+  //       const rs = await axios.get("http://localhost:8889/reserved/show", {
+  //         headers: {Authorization: `Bearer ${token}`}
+  //       });
+  //       // console.log(rs.data)
+  //       setData(rs.data)
 
-      } catch (error) {
-        alert(error);
-      }
-    };
-    showReserved();
+  //     } catch (error) {
+  //       alert(error);
+  //     }
+  //   };
+  //   showReserved();
 
-  }, [trigger]);
+  // }, [trigger]);
 
 
-  useEffect(() => {
-    const showReserved = async () => {
-      try {
-        const token = localStorage.getItem('token')
-        if (!token) {return}
-        const rs = await axios.get("http://localhost:8889/reserved/adminShow", {
-          headers: {Authorization: `Bearer ${token}`}
-        });
-        // console.log(rs.data)
-        setAdminData(rs.data)
-        // console.log(adminData);
+  // useEffect(() => {
+  //   const showReserved = async () => {
+  //     try {
+  //       const token = localStorage.getItem('token')
+  //       if (!token) {return}
+  //       const rs = await axios.get("http://localhost:8889/reserved/adminShow", {
+  //         headers: {Authorization: `Bearer ${token}`}
+  //       });
+  //       // console.log(rs.data)
+  //       setAdminData(rs.data)
+  //       // console.log(adminData);
 
-      } catch (error) {
-        alert(error);
-      }
-    };
-    showReserved();
+  //     } catch (error) {
+  //       alert(error);
+  //     }
+  //   };
+  //   showReserved();
 
-  }, []);
+  // }, []);
 
   const deleteReserved = async (reservedId) => {
     try {
@@ -63,7 +63,7 @@ function ReservedContextProvider(props) {
 const editReserved = async (id, data) => {
   try {
     const token = localStorage.getItem('token');
-    await axios.patch(`http://localhost:8889/reserved/updateReseved/${id}`, data, {
+    await axios.patch(`http://localhost:8889/booking/updateReseved/${id}`, data, {
       headers: { Authorization: `Bearer ${token}` }
     });
     alert('การจองได้รับการอัปเดตเรียบร้อยแล้ว');

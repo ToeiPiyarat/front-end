@@ -11,8 +11,6 @@ const userNav = [
   { to : '/home', text: 'ทำการจอง' },
   { to : '/payuser', text: 'เช็คสถานะ' },
   { to : '/profire', text:'แก้ไขข้อมูลส่วนตัว' },
-  { to : '/vechinumber', text:'เพิ่มเลขทะเบียนรถ' },
-  { to : '/pay', text:'จ่ายเงิน' },
   
 ]
 
@@ -38,14 +36,10 @@ export default function Header() {
     navigate('/')
   }
 
-  const hdlProfire = () => {
-    navigate('/profire')
-  }
-
   return (
       <div className="navbar  bg-[#c2c7cc] hover:bg-[#cccccc] focus:bg-[#7aa5d0] text-white py-3 px-4 flex items-center justify-between">
         <div className="flex items-center">
-            <a onClick={hdlProfire} className="text-2xl font-bold bg-gradient-to-br from-blue-400 to-purple-600 bg-clip-text text-transparent cursor-pointer hover:text-4xl">{user?.id ? user.username : ''}</a>
+            <div className="text-2xl font-bold bg-gradient-to-br from-blue-400 to-purple-600 bg-clip-text text-transparent cursor-pointer hover:text-4xl">{user?.id ? user.username : ''}</div>
         </div>
       <div className="flex-none">
         <ul className="menu menu-horizontal px-1 flex items-center">

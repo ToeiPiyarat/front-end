@@ -1,72 +1,105 @@
-// LoginForm.js
 import axios from 'axios';
 import { useState } from 'react';
 import useAuth from '../hooks/useAuth';
-import '../styles.css';
+import { useNavigate } from 'react-router-dom';
+import './login.css';
+import loginImage from '../assets/logologin.png';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser, faLock, faEye, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 
 export default function LoginForm() {
-  const { setUser, user } = useAuth();
+  const { setUser } = useAuth();
   const [input, setInput] = useState({
     username: '',
     password: ''
   });
+  const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const navigate = useNavigate();
 
-  const hdlChange = e => {
+  const handleChange = e => {
     setInput(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const hdlSubmit = async e => {
+  const togglePasswordVisibility = () => {
+    setShowPassword(prev => !prev);
+  };
+
+  const handleSubmit = async e => {
+    e.preventDefault();
     try {
-      e.preventDefault();
-      const rs = await axios.post('http://localhost:8889/auth/login', input);
-      localStorage.setItem('token', rs.data.token);
-      const rs1 = await axios.get('http://localhost:8889/auth/me', {
-        headers: { Authorization: `Bearer ${rs.data.token}` }
+      const response = await axios.post('http://localhost:8889/auth/login', input);
+      const token = response.data.token;
+      localStorage.setItem('token', token);
+      console.log(response.data);
+      const userResponse = await axios.get('http://localhost:8889/auth/me', {
+        headers: { Authorization: `Bearer ${token}` }
       });
-      setUser(rs1.data);
-      console.log(rs.data)
-      window.location.reload();
-    } catch (err) {
-      setErrorMessage('ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง');
+
+      setUser(userResponse.data);
+      navigate('/');
+    } catch (error) {
+      if (error.response) {
+        setErrorMessage('ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง');
+      } else if (error.request) {
+        setErrorMessage('ไม่สามารถติดต่อเซิร์ฟเวอร์ได้');
+      } else {
+        setErrorMessage('เกิดข้อผิดพลาดบางอย่าง');
+      }
     }
   };
 
   return (
-    <div className="p-5 border w-2/6 min-w-[100px] mx-auto rounded mt-5 bg-red-100 max-w-[30vw]">
-      <div className="flex justify-center">
-        <img src="car.jpg" className="w-24 h-24 rounded-full border border-black" />
+    <div className="login-container">
+      <div className="login-left">
+        <img src={loginImage} className="login-image" alt="Login" />
       </div>
-      <div className="text-3xl mb-5 flex-grow-0 text-center">กรุณาเข้าสู่ระบบของท่าน</div>
-      <form className="flex flex-col gap-2" onSubmit={hdlSubmit}>
-        <label className="form-control w-full max-w-full flex justify-start items-center">
-          <span className="label-text mr-2">ชื่อผู้ใช้งาน</span>
-          <input
-            type="text"
-            className="input input-bordered w-full max-w-full"
-            name="username"
-            value={input.username}
-            onChange={hdlChange}
-          />
-        </label>
-
-        <label className="form-control w-full max-w-full flex justify-start items-center">
-          <span className="label-text mr-2">รหัสผ่าน</span>
-          <input
-            type="password"
-            className="input input-bordered w-full max-w-full"
-            name="password"
-            value={input.password}
-            onChange={hdlChange}
-          />
-        </label>
-
-        {errorMessage && <p className="text-red-500 text-sm">{errorMessage}</p>}
-
-        <div className="flex justify-center">
-          <button type="submit" className="btn btn-outline bg-green-500 hover:bg-green-600 focus:bg-green-600 hover:text-white focus:text-white">ล็อคอิน</button>
+      <div className="login-right">
+        <div className="login-header">
+          ให้ท่านกรอกข้อมูลด้านล่างเพื่อเข้าสู่ระบบ
         </div>
-      </form>
+        <form className="login-form" onSubmit={handleSubmit}>
+          <div className="input-group">
+            <FontAwesomeIcon icon={faEnvelope} className="input-icon" />
+            <input
+              type="text"
+              placeholder="ชื่อผู้ใช้งาน"
+              className="input-field"
+              name="username"
+              value={input.username}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="input-group">
+            <FontAwesomeIcon icon={faLock} className="input-icon" />
+            <div className="password-input">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                placeholder="รหัสผ่าน"
+                className="input-field"
+                name="password"
+                value={input.password}
+                onChange={handleChange}
+              />
+              <FontAwesomeIcon
+                icon={faEye}
+                className="password-toggle"
+                onClick={togglePasswordVisibility}
+              />
+            </div>
+          </div>
+          {errorMessage && <p className="error-message">{errorMessage}</p>}
+          <div className="button-group">
+  <button type="submit" className="login-button">เข้าสู่ระบบ</button>
+  <div className="register-link">
+    ยังไม่มีบัญชี? <a href="/register">สมัครใช้งาน</a>
+  </div>
+</div>
+        </form>
+        {/* <div className="register-link">
+          ยังไม่มีบัญชี? <a href="/register">สมัครใช้งาน</a>
+        </div> */}
+      </div>
     </div>
   );
 }

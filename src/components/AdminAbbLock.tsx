@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, Link, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getlock, postlock, deletelock } from '../API/api';
+import Swal from 'sweetalert2';
 
 const AdminAbbLock = () => {
   const { id } = useParams();
@@ -10,7 +11,7 @@ const AdminAbbLock = () => {
   const [lock, setLock] = useState({
     lock_name: '',
     status: 'ว่าง',
-    lock_price: '',
+    lock_price: '50', // เปลี่ยนให้ราคาล็อคเป็นค่าคงที่ 50 บาท
     parking_id: id
   });
 
@@ -24,44 +25,89 @@ const AdminAbbLock = () => {
 
   const submitLock = async (e) => {
     e.preventDefault();
-    try {
-      const rs = await postlock(lock);
-      setLock(rs.data); 
-      setShowForm(false);
-      alert("Lock information submitted successfully!");
+  
+    const confirmAdd = await Swal.fire({
+      icon: 'question',
+      title: 'คุณต้องการที่จะเพิ่มข้อมูล Lock ใช่หรือไม่?',
+      showCancelButton: true,
+      confirmButtonText: 'ใช่, เพิ่มข้อมูล',
+      cancelButtonText: 'ยกเลิก'
+    });
+  
+    if (confirmAdd.isConfirmed) {
+      try {
+        const rs = await postlock(lock);
+        setShowForm(false);
+        Swal.fire({
+          icon: 'success',
+          title: 'เพิ่มข้อมูลสำเร็จ',
+          text: 'ข้อมูล Lock ได้ถูกเพิ่มเข้าสู่ระบบแล้ว!',
+          confirmButtonText: 'ตกลง'
+        });
+  
+        // Update locks state correctly
+        const updatedLocks = [...locks, rs.data].filter(lock => lock.lock_name !== undefined).sort((a, b) => a.lock_name.localeCompare(b.lock_name));
+        setLocks(updatedLocks);
+      } catch (err) {
+        console.error(err);
+        Swal.fire({
+          icon: 'error',
+          title: 'เกิดข้อผิดพลาด',
+          text: 'ไม่สามารถเพิ่มข้อมูล Lock ได้ในขณะนี้',
+          confirmButtonText: 'ตกลง'
+        });
+      }
+    }
+  };
 
-      setLocks(prevLocks => [...prevLocks, rs.data]);
+  const fetchLocks = async () => {
+    try {
+      const rs = await getlock();
+      const updatedLocks = rs.data.map(lock => ({
+        ...lock,
+        status: lock.status === 'จองแล้ว' ? 'ไม่ว่าง' : lock.status
+      })).filter(lock => lock.parking_id === parseInt(id) && lock.lock_name !== undefined).sort((a, b) => a.lock_name.localeCompare(b.lock_name));
+      
+      setLocks(updatedLocks);
     } catch (err) {
       console.error(err);
-      alert("Failed to submit lock information.");
     }
   };
 
   useEffect(() => {
-    const fetchLocks = async () => {
-      try {
-        const rs = await getlock();
-        const filteredLocks = rs.data.filter(lock => lock.parking_id === parseInt(id));
-        setLocks(filteredLocks);
-        console.log(filteredLocks);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
     if (id) {
       fetchLocks();
     }
   }, [id]);
 
   const deleteLockById = async (lockId) => {
-    try {
-      await deletelock(lockId); 
-      setLocks(prevLocks => prevLocks.filter(lock => lock.id !== lockId));
-      alert("Lock information deleted successfully!");
-    } catch (err) {
-      console.error(err);
-      alert("Failed to delete lock information.");
+    const confirmDelete = await Swal.fire({
+      icon: 'question',
+      title: 'คุณต้องการที่จะลบข้อมูล Lock ใช่หรือไม่?',
+      showCancelButton: true,
+      confirmButtonText: 'ใช่, ลบข้อมูล',
+      cancelButtonText: 'ยกเลิก'
+    });
+
+    if (confirmDelete.isConfirmed) {
+      try {
+        await deletelock(lockId); 
+        setLocks(prevLocks => prevLocks.filter(lock => lock.id !== lockId));
+        Swal.fire({
+          icon: 'success',
+          title: 'ลบข้อมูลสำเร็จ',
+          text: 'ข้อมูล Lock ได้ถูกลบออกจากระบบแล้ว!',
+          confirmButtonText: 'ตกลง'
+        });
+      } catch (err) {
+        console.error(err);
+        Swal.fire({
+          icon: 'error',
+          title: 'เกิดข้อผิดพลาด',
+          text: 'ไม่สามารถลบข้อมูล Lock ได้ในขณะนี้',
+          confirmButtonText: 'ตกลง'
+        });
+      }
     }
   };
 
@@ -88,39 +134,34 @@ const AdminAbbLock = () => {
               required
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="lock_price">
-              Lock Price
-            </label>
-            <input
-              type="text"
-              name="lock_price"
-              value={lock.lock_price}
-              onChange={hdlChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              required
-            />
-          </div>
+          <input
+            type="hidden"
+            name="lock_price"
+            value="50"
+          />
           <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
             Submit Lock
           </button>
         </form>
       )}
-      <div>
-        <h1 className="text-3xl mb-4">Locks in Userzone</h1>
+      <div className="flex flex-wrap">
         {locks.map((lock) => (
-          <div key={lock.id} className="border p-4 mb-4 rounded-md">
-            <p><strong>Lock Name:</strong> {lock.lock_name}</p>
-            <p><strong>Status:</strong> {lock.status}</p>
-            <p><strong>Lock Price:</strong> {lock.lock_price}</p>
+          <div key={lock.id} className="border p-4 mb-4 rounded-md mr-4" style={{ flexBasis: '20%' }}>
+            <p><strong>โซนที่ : </strong> {lock.lock_name}</p>
+            <p><strong>Lock Price:</strong> 50 บาท</p>
             {lock.parking && (
               <div>
-                <p><strong>Parking Name:</strong> {lock.parking.parking_name}</p>
+                <p><strong>สถานที่จอง :</strong> {lock.parking.parking_name}</p>
                 <p><strong>Parking Location:</strong> {lock.parking.parking_location}</p>
-                <p><strong>City:</strong> {lock.parking.city}</p>
-                <p><strong>Province:</strong> {lock.parking.province}</p>
+                <p><strong>เมือง :</strong> {lock.parking.city}</p>
+                <p><strong>จังหวัด :</strong> {lock.parking.province}</p>
                 <img src={lock.parking.photo} alt={lock.parking.parking_name} className="mt-2 rounded-md" style={{ maxWidth: '100%' }} />
-                <button className='btn btn-error' onClick={() => deleteLockById(lock.id)}>ลบข้อมูล</button>
+                {lock.status === 'ว่าง' && (
+                  <button className='bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline' onClick={() => deleteLockById(lock.id)}>ลบข้อมูล</button>
+                )}
+                {lock.status === 'จองแล้ว' && (
+                  <p className="text-red-500">Lock นี้ถูกจองแล้ว</p>
+                )}
               </div>
             )}
           </div>
@@ -131,4 +172,3 @@ const AdminAbbLock = () => {
 };
 
 export default AdminAbbLock;
-
