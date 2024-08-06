@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { patchupdate } from '../API/api';
+import axios from 'axios';
 import AuthContext from '../contexts/AuthContext';
 
 export default function UserProfile() {
@@ -28,10 +28,13 @@ export default function UserProfile() {
     const hdlSubmit = async (e) => {
         e.preventDefault();
         try {
-            await patchupdate(user.id, update); // ส่งคำขอ PATCH ไปยัง backend ด้วย ID ของผู้ใช้และข้อมูลที่ต้องการอัปเดต
-            updateProfile(update); // อัปเดตโปรไฟล์ใน context หลังจากอัปเดตสำเร็จ
-            setIsUpdate(false); // ปิดฟอร์มแก้ไขข้อมูล
-            window.location.reload(); // รีเฟรชหน้าเพื่อแสดงข้อมูลที่อัปเดตแล้ว
+            const token = localStorage.getItem('token'); // Retrieve token from local storage
+            await axios.patch(`http://localhost:8889/auth/update/${user.id}`, update, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            updateProfile(update); 
+            setIsUpdate(false);
+            window.location.reload();
         } catch (error) {
             console.error('Profile update failed:', error);
         }

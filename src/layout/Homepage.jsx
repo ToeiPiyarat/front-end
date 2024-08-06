@@ -11,7 +11,7 @@ export default function Homepage() {
     setTimeout(() => {
       navigate(path);
       setClicked(false);
-    }, 300); // Adjust timing to match your animation duration
+    }, 300);
   };
 
   return (

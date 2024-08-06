@@ -2,8 +2,8 @@ import axios from 'axios';
 
 const baseURL = 'http://localhost:8889/car/';  
 const bookingURL = 'http://localhost:8889/booking/';
-const payURL = 'http://localhost:8889/payment/'
-const token = localStorage.getItem('token');  
+const payURL = 'http://localhost:8889/payment/';
+const token = localStorage.getItem('token');
 
 const api = axios.create({
   baseURL: baseURL,
@@ -40,7 +40,10 @@ export const postparking = (parking) => api.post('/parking', parking)
 export const postlock = (lock) => api.post('/lockpost', lock)
 export const deletelock = (id) => api.delete(`/lockdelete/${id}`)
 export const deleteParking = (id) => api.delete(`/parking/${id}`);
-export const patchupdate = (id, updateData) => api.patch(`/update/${id}`, updateData);
 export const shbookingall = () => apibooking.get('/shbookin')
+export const putuptime = (data) => apipay.put(`/payment/${data.booking_id}/status`, data);
+export const deleterPayment = (id) => apipay.delete(`/paymentusdeleter/${id}`)
+export const updatePaymentStatus = (id, status) => apipay.patch(`/payment/${id}/status`, { id, status });
+
 
 export default api;

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import useAuth from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import './login.css';
-import loginImage from '../assets/logologin.png';
+import loginImage from '../assets/login2.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faLock, faEye, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 
@@ -35,9 +35,13 @@ export default function LoginForm() {
       const userResponse = await axios.get('http://localhost:8889/auth/me', {
         headers: { Authorization: `Bearer ${token}` }
       });
-
+  
       setUser(userResponse.data);
-      navigate('/');
+  
+      // Navigate to the home page and use the key prop to force refresh
+      navigate('/', { replace: true });
+      
+      // Optionally, you can use a state management tool or context to update other components
     } catch (error) {
       if (error.response) {
         setErrorMessage('ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง');
@@ -47,7 +51,7 @@ export default function LoginForm() {
         setErrorMessage('เกิดข้อผิดพลาดบางอย่าง');
       }
     }
-  };
+  };  
 
   return (
     <div className="login-container">
@@ -90,15 +94,12 @@ export default function LoginForm() {
           </div>
           {errorMessage && <p className="error-message">{errorMessage}</p>}
           <div className="button-group">
-  <button type="submit" className="login-button">เข้าสู่ระบบ</button>
-  <div className="register-link">
-    ยังไม่มีบัญชี? <a href="/register">สมัครใช้งาน</a>
-  </div>
-</div>
+            <button type="submit" className="login-button">เข้าสู่ระบบ</button>
+              <div className="register-link">
+                ยังไม่มีบัญชี? <a href="/register">สมัครใช้งาน</a>
+            </div>
+          </div>
         </form>
-        {/* <div className="register-link">
-          ยังไม่มีบัญชี? <a href="/register">สมัครใช้งาน</a>
-        </div> */}
       </div>
     </div>
   );

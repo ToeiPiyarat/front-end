@@ -20,7 +20,7 @@ import Reseverd from '../components/Reseverd'
 import PaymentUserId from '../components/paymentuserid'
 import AdminInputData  from '../components/AdminInputData'
 import AdminAbbLock from '../components/AdminAbbLock'
-
+import AdminLayout from '../layout/AdminLayout'
 
 const guestRouter = createBrowserRouter([
   {
@@ -34,12 +34,6 @@ const guestRouter = createBrowserRouter([
       { path: '/homepage', element: <Homepage /> },
       { path: '/login', element: <LoginForm /> },
       { path: '/register', element: <RegisterForm />},
-      // { path: '/home', element:<HOME/> },
-      // { path: '/reserved', element:<ReseverdForm/> },
-      // { path: '/reserved/show', element:<ReservedDashboard/> },
-      // { path: '/reserved/delete/:reservedId', element:<ReservedDashboard/> },
-      // { path: '*', element: <p> PAGE NOT FOUND</p>},
-      // { path: '/reserved/edit', element: <AdminReseverd/> },
 
     ]
   }
@@ -56,15 +50,7 @@ const userRouter = createBrowserRouter([
       { index: true, element: <HOME /> },
       { path: '/login', element: <LoginForm /> },
       { path: '/home', element:<HOME/> },
-      // {path:'/reserved/form/:spot' ,element:<ReseverdForm/>},
-      // { path: '/reserved/show', element:<ReservedDashboard/> },
-      // { path: '/reserved/delete/:reservedId', element:<ReservedDashboard/> },
-      // { path: '*', element: <p> PAGE NOT FOUND</p>},
-      // { path: '/reserved/edit', element: <AdminReseverd/> },
       { path: '/profire', element: <UserProfire/> },
-      // { path: '/vechinumber', element: <UserVechinumber/> },
-      // { path: '/add', element: <USerAddCar/> },
-      // { path: '/edit/*', element: <EditReseved/> },
       { path: '/reservation', element: <UserReservation/>},
       { path: '/addlock/:id', element: <Userzone/>},
       { path: '/booking/:id', element: <Reseverd/> },
@@ -78,21 +64,14 @@ const userRouter = createBrowserRouter([
 const adminRouter = createBrowserRouter([
   {
     path: '/',
-    element: <>
-      <Header />
-      <Outlet />
-    </>,
+    element: <AdminLayout />,
     children : [
       { index: true, element: <Admin /> },
       { path: '/login', element: <LoginForm /> },
       { path: '/home', element:<HOME/> },
-      // { path: '/reserved', element:<ReseverdForm/> },
-      // { path: '/reserved/show', element:<ReservedDashboard/> },
-      // { path: '/reserved/delete/:reservedId', element:<ReservedDashboard/> },
       { path: '/admin', element:<Admin/> },
       { path: '*', element: <p> PAGE NOT FOUND</p>},
       { path: '/History', element: <AdminReseverd/> },
-      // { path: '/add', element: <USerAddCar/> },
       { path: '/addcar', element: <AdminInputData/>},
       { path: '/addlock/:id', element: <AdminAbbLock/>}
       

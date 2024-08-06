@@ -8,8 +8,8 @@ body, html {
 
 .background-container {
   display: flex;
-  height: 100vh;
-  width: 100vw;
+  height: 85vh;
+  width: 85vw;
 }
 
 .text-container {
@@ -24,9 +24,11 @@ body, html {
 .image-container {
   flex: 1;
   background-image: url('../assets/bg.png');
-  background-size: cover;
+  background-size: 100% 100%; /* Scales the image to 50% of the container's width and height */
   background-position: center;
+  background-repeat: no-repeat;
 }
+
 
 .main-heading {
   font-size: 3rem;

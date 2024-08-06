@@ -23,7 +23,6 @@ export default function RegisterForm() {
   const hdlSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate password confirmation
     if (input.password !== input.confirmPassword) {
       Swal.fire({
         icon: 'error',
@@ -33,7 +32,6 @@ export default function RegisterForm() {
       return;
     }
 
-    // Ask for confirmation before registration
     const confirmRegister = await Swal.fire({
       icon: 'question',
       title: 'ยืนยันการสมัคร',
@@ -44,7 +42,7 @@ export default function RegisterForm() {
     });
 
     if (!confirmRegister.isConfirmed) {
-      return; // Cancel registration if not confirmed
+      return;
     }
 
     try {
@@ -55,7 +53,7 @@ export default function RegisterForm() {
           title: 'สมัครสมาชิกสำเร็จ!',
           text: 'คุณได้ทำการสมัครสมาชิกเรียบร้อยแล้ว',
         }).then(() => {
-          navigate('/login'); // Redirect to login page after successful registration
+          navigate('/login');
         });
       }
     } catch (err) {
@@ -103,7 +101,7 @@ export default function RegisterForm() {
               />
             </div>
           </div>
-          <div className="form-group">
+          <div className="form-group-full">
             <label className="form-label">ชื่อผู้ใช้งาน</label>
             <input
               type="text"
@@ -135,7 +133,7 @@ export default function RegisterForm() {
               />
             </div>
           </div>
-          <div className="form-group">
+          <div className="form-group-full">
             <label className="form-label">อีเมล์</label>
             <input
               type="email"
@@ -145,7 +143,7 @@ export default function RegisterForm() {
               onChange={hdlChange}
             />
           </div>
-          <div className="form-group">
+          <div className="form-group-full">
             <label className="form-label">เบอร์โทร</label>
             <input
               type="text"

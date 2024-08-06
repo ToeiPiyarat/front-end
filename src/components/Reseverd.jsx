@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { postbooking, getidlock, getuser } from '../API/api';
-import loginImage from '../assets/logologin.png';
+import loginImage from '../assets/reservice.jpg';
 
 const Reserved = () => {
   const { id } = useParams();
+  const location = useLocation();
   const [user, setUser] = useState([]);
   const [lock, setLock] = useState([]);
   const navigate = useNavigate();
@@ -29,14 +30,15 @@ const Reserved = () => {
         setBooking(prevBooking => ({
           ...prevBooking,
           total_amount: lockData.lock_price,
-          lockId: lockData.id
+          lockId: lockData.id,
+          booking_date: location.state?.selectedDate || ''
         }));
       } catch (err) {
         console.error(err);
       }
     };
     fetchLock();
-  }, [id]);
+  }, [id, location.state?.selectedDate]);
 
   const hdlChange = (e) => {
     const { name, value } = e.target;
@@ -49,48 +51,19 @@ const Reserved = () => {
   const postBookings = async (e) => {
     e.preventDefault();
     try {
-      // Update booking object to only include the date part in English format (YYYY-MM-DD)
-      const dateOnly = booking.booking_date.substring(0, 10);
-  
-      // Create postData with only the date part
       const postData = {
         ...booking,
-        booking_date: dateOnly
+        booking_date: booking.booking_date
       };
   
       const rs = await postbooking(postData);
       console.log(rs.data);
-      navigate(`/userpay/${rs.data.booking.id}`);
+      navigate(`/userpay/${rs.data.booking.id}`, { state: { bookingDate: booking.booking_date } });
     } catch (err) {
       console.error('Error posting booking:', err);
     }
   };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    const yyyy = date.getFullYear();
-    const mm = String(date.getMonth() + 1).padStart(2, '0');
-    const dd = String(date.getDate()).padStart(2, '0');
-    return `${yyyy}-${mm}-${dd}`;
-  };
-
-  const getMinDate = () => {
-    const today = new Date();
-    const dd = String(today.getDate()).padStart(2, '0');
-    const mm = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
-    const yyyy = today.getFullYear();
-    return yyyy + '-' + mm + '-' + dd;
-  };
-
-  const getMaxDate = () => {
-    const today = new Date();
-    const nextWeek = new Date(today.setDate(today.getDate() + 7));
-    const dd = String(nextWeek.getDate()).padStart(2, '0');
-    const mm = String(nextWeek.getMonth() + 1).padStart(2, '0'); // January is 0!
-    const yyyy = nextWeek.getFullYear();
-    return yyyy + '-' + mm + '-' + dd;
-  };
+  
 
   return (
     <div className="container mx-auto p-8 flex justify-center items-center">
@@ -132,19 +105,15 @@ const Reserved = () => {
                 />
               </div>
               <div>
-                <label className="block text-gray-900">วันเวลา:</label>
+                <label className="block text-gray-900">วันที่เลือกในการจอง</label>
                 <input
                   type="date"
                   name="booking_date"
                   value={booking.booking_date}
-                  onChange={hdlChange}
-                  min={getMinDate()}
-                  max={getMaxDate()}
-                  required
-                  className="w-full px-3 py-2 border rounded-lg"
+                  readOnly
+                  className="w-full px-3 py-2 border rounded-lg bg-gray-100 cursor-not-allowed"
                 />
               </div>
-              <p>{formatDate(booking.booking_date)}</p> {/* Displaying the date in YYYY-MM-DD format */}
               <input
                 type="hidden"
                 name="user_id"

@@ -24,6 +24,20 @@ export const AdminHistory = () => {
     }));
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setParking((prevParking) => ({
+          ...prevParking,
+          photo: reader.result
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const submitParking = async (e) => {
     e.preventDefault();
     const swalConfirm = await Swal.fire({
@@ -39,9 +53,14 @@ export const AdminHistory = () => {
 
     if (swalConfirm.isConfirmed) {
       try {
-        const rs = await postparking(parking);
-        setParking(rs.data);
-        console.log(rs.data);
+        await postparking(parking);
+        setParking({
+          parking_name: '',
+          parking_location: '',
+          city: '',
+          province: '',
+          photo: ''
+        }); // Clear the form fields
         Swal.fire('สำเร็จ!', 'ข้อมูลที่จอดรถถูกเพิ่มเรียบร้อยแล้ว', 'success');
         setShowForm(false); 
         fetchMarket(); // Refresh market data
@@ -100,6 +119,9 @@ export const AdminHistory = () => {
 
   return (
     <div className="container mx-auto p-8">
+      <h1 className="text-3xl mb-4 font-semibold text-gray-700">
+        เพิ่มที่จอดรถ
+      </h1>
       <button
         onClick={() => setShowForm(!showForm)}
         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4"
@@ -153,14 +175,23 @@ export const AdminHistory = () => {
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">URL รูปภาพ:</label>
+            <label className="block text-gray-700 text-sm font-bold mb-2">รูปภาพ:</label>
             <input
-              type="text"
-              name="photo"
-              value={parking.photo}
-              onChange={hdlChange}
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             />
+            {parking.photo && (
+              <div className="mt-2">
+                <img
+                  src={parking.photo}
+                  alt="Preview"
+                  className="w-40 h-40 object-cover rounded-lg"
+                  style={{ maxWidth: '200px', maxHeight: '200px' }}
+                />
+              </div>
+            )}
           </div>
           <button
             type="submit"
@@ -195,9 +226,9 @@ export const AdminHistory = () => {
             <div className="mt-2">
               <img
                 src={markets.photo}
-                alt="Market"
-                className="w-60 h-60 object-cover rounded-lg"
-                style={{ maxWidth: '300px', maxHeight: '300px' }}
+                alt="Parking"
+                className="w-40 h-40 object-cover rounded-lg"
+                style={{ maxWidth: '200px', maxHeight: '200px' }}
               />
             </div>
           )}
@@ -205,6 +236,6 @@ export const AdminHistory = () => {
       ))}
     </div>
   );
-}
+};
 
 export default AdminHistory;

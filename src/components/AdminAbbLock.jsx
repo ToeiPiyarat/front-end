@@ -36,18 +36,18 @@ const AdminAbbLock = () => {
   
     if (confirmAdd.isConfirmed) {
       try {
-        const rs = await postlock(lock);
-        setShowForm(false);
+        await postlock(lock); // Send the new lock to the server
+        setShowForm(false); // Hide the form after submission
+  
+        // Fetch the updated locks
+        await fetchLocks();
+  
         Swal.fire({
           icon: 'success',
           title: 'เพิ่มข้อมูลสำเร็จ',
           text: 'ข้อมูล Lock ได้ถูกเพิ่มเข้าสู่ระบบแล้ว!',
           confirmButtonText: 'ตกลง'
         });
-  
-        // Update locks state correctly
-        const updatedLocks = [...locks, rs.data].filter(lock => lock.lock_name !== undefined).sort((a, b) => a.lock_name.localeCompare(b.lock_name));
-        setLocks(updatedLocks);
       } catch (err) {
         console.error(err);
         Swal.fire({
@@ -59,6 +59,7 @@ const AdminAbbLock = () => {
       }
     }
   };
+  
 
   const fetchLocks = async () => {
     try {
@@ -123,7 +124,7 @@ const AdminAbbLock = () => {
         <form onSubmit={submitLock} className="mb-8 bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="lock_name">
-              Lock Name
+              ชื่อโซน
             </label>
             <input
               type="text"
@@ -140,7 +141,7 @@ const AdminAbbLock = () => {
             value="50"
           />
           <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-            Submit Lock
+            เพิ่มโซน
           </button>
         </form>
       )}
@@ -148,19 +149,16 @@ const AdminAbbLock = () => {
         {locks.map((lock) => (
           <div key={lock.id} className="border p-4 mb-4 rounded-md mr-4" style={{ flexBasis: '20%' }}>
             <p><strong>โซนที่ : </strong> {lock.lock_name}</p>
-            <p><strong>Lock Price:</strong> 50 บาท</p>
+            <p><strong>ราคา:</strong> 50 บาท</p>
             {lock.parking && (
               <div>
                 <p><strong>สถานที่จอง :</strong> {lock.parking.parking_name}</p>
-                <p><strong>Parking Location:</strong> {lock.parking.parking_location}</p>
+                <p><strong>ที่ตั้งที่จอดรถ :</strong> {lock.parking.parking_location}</p>
                 <p><strong>เมือง :</strong> {lock.parking.city}</p>
                 <p><strong>จังหวัด :</strong> {lock.parking.province}</p>
                 <img src={lock.parking.photo} alt={lock.parking.parking_name} className="mt-2 rounded-md" style={{ maxWidth: '100%' }} />
                 {lock.status === 'ว่าง' && (
                   <button className='bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline' onClick={() => deleteLockById(lock.id)}>ลบข้อมูล</button>
-                )}
-                {lock.status === 'จองแล้ว' && (
-                  <p className="text-red-500">Lock นี้ถูกจองแล้ว</p>
                 )}
               </div>
             )}
